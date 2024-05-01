@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "228827191328",
+    "project_id": "latihan-firestore-b1ca8",
+    "storage_bucket": "latihan-firestore-b1ca8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228827191328:android:389a131bf53eaee08a0445",
+        "android_client_info": {
+          "package_name": "com.example.firestore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpR_rRLS_b9p_UQjyjnkomvcPmtR51Ego"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
