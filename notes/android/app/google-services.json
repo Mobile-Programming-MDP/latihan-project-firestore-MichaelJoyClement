@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1081914513944",
+    "project_id": "notes-afe15",
+    "storage_bucket": "notes-afe15.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081914513944:android:3b00182f5b4688ad8d816d",
+        "android_client_info": {
+          "package_name": "com.example.notes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAo7SMuHIP78AN_42iN8LJ76gH2UeNfzQI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
