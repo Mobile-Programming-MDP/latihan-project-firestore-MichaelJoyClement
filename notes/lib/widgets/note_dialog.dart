@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:notes/models/note.dart';
-import 'package:notes/services/location_services.dart';
-import 'package:notes/services/note_services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:notes/models/note.dart';
+import 'package:notes/services/location_service.dart';
+import 'package:notes/services/note_service.dart';
 
 class NoteDialog extends StatefulWidget {
   final Note? note;
@@ -19,10 +21,10 @@ class _NoteDialogState extends State<NoteDialog> {
   final TextEditingController _descriptionController = TextEditingController();
   XFile? _imageFile;
   Position? _position;
+  final picker = ImagePicker();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.note != null) {
       _titleController.text = widget.note!.title;
@@ -30,9 +32,15 @@ class _NoteDialogState extends State<NoteDialog> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<void> _getLocation() async {
+    final location = await LocationService().getCurrentLocaton();
+    setState(() {
+      _position = location;
+    });
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         _imageFile = pickedFile;
@@ -40,12 +48,39 @@ class _NoteDialogState extends State<NoteDialog> {
     }
   }
 
-  Future<void> _getLocation() async {
-    final location = await LocationServices().getCurrentLocation();
-
-    setState(() {
-      _position = location;
-    });
+  void _showPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const ListTile(
+              title: Text(
+                'Image Source',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.camera);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -75,14 +110,11 @@ class _NoteDialogState extends State<NoteDialog> {
             padding: EdgeInsets.only(
               top: 20,
             ),
-            child: Text("Image: "),
+            child: Text('Image: '),
           ),
           Expanded(
             child: _imageFile != null
-                ? Image.network(
-                    _imageFile!.path,
-                    fit: BoxFit.cover,
-                  )
+                ? Image.file(File(_imageFile!.path), fit: BoxFit.cover)
                 : (widget.note?.imageUrl != null &&
                         Uri.parse(widget.note!.imageUrl!).isAbsolute
                     ? Image.network(
@@ -92,12 +124,12 @@ class _NoteDialogState extends State<NoteDialog> {
                     : Container()),
           ),
           TextButton(
-            onPressed: _pickImage,
-            child: const Text("Pick Image"),
+            onPressed: _showPicker,
+            child: const Text('Select Image'),
           ),
           TextButton(
             onPressed: _getLocation,
-            child: const Text("Get Location"),
+            child: const Text('Get Location'),
           ),
           Text(
             _position?.latitude != null && _position?.longitude != null
@@ -130,7 +162,6 @@ class _NoteDialogState extends State<NoteDialog> {
               title: _titleController.text,
               description: _descriptionController.text,
               imageUrl: imageUrl,
-              createdAt: widget.note?.createdAt,
               lat: widget.note?.lat.toString() != _position!.latitude.toString()
                   ? _position!.latitude.toString()
                   : widget.note?.lat.toString(),
@@ -138,6 +169,7 @@ class _NoteDialogState extends State<NoteDialog> {
                   widget.note?.lng.toString() != _position!.longitude.toString()
                       ? _position!.longitude.toString()
                       : widget.note?.lng.toString(),
+              createdAt: widget.note?.createdAt,
             );
             if (widget.note == null) {
               NoteService.addNote(note).whenComplete(() {
